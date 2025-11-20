@@ -1,0 +1,78 @@
+/* Activity Cards */
+.activity-grid {
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+}
+
+.activity-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    transition: all 0.2s;
+}
+
+.activity-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-color: #CBD5E1;
+}
+
+.activity-info {
+    flex: 1;
+}
+
+.activity-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+
+.activity-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.activity-actions {
+    display: flex;
+    gap: 8px;
+}
+
+
+/* Empty State */
+.empty-state {
+    padding: 64px 24px;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: #F8FAFC;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #CBD5E1;
+}
+
+.empty-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+
+.empty-description {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 24px;
+}
