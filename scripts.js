@@ -508,12 +508,19 @@ if (window.elementSdk) {
 
 function toggleSidebar() {
   const shell = document.getElementById('appShell');
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  // agora consideramos "layout mobile/topo" até 955px
+  const isMobile = window.matchMedia('(max-width: 955px)').matches;
+
   if (isMobile) {
-    shell.classList.toggle('mobile-open');      // abre/fecha off-canvas
+    // em telas <= 955px o botão vira "menu retrátil no topo"
+    shell.classList.toggle('mobile-open');
   } else {
-    shell.classList.toggle('collapsed');        // retrátil no desktop
-    localStorage.setItem('sidebarCollapsed', shell.classList.contains('collapsed') ? '1' : '0');
+    // acima disso continua o comportamento de retrair a sidebar lateral
+    shell.classList.toggle('collapsed');
+    localStorage.setItem(
+      'sidebarCollapsed',
+      shell.classList.contains('collapsed') ? '1' : '0'
+    );
   }
 }
 

@@ -125,7 +125,7 @@ function openUsuarioFormModal(usuarioId) {
   overlay.className = 'modal-overlay';
 
   overlay.innerHTML = `
-    <div class="modal modal--large">
+    <div class="modal modal--large"  style="padding: 0px;">
       <div class="modal-header">
         <h2 class="modal-title">${isEdit ? 'Editar Usuário' : 'Novo Usuário'}</h2>
         <button class="modal-close" onclick="closeUsuarioModal()">×</button>

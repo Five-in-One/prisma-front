@@ -33,3 +33,7 @@ body {
 .link:hover {
     color: #4338CA;
 }
+
+.remove-padding {
+    padding: 0px;
+}

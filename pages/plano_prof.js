@@ -118,7 +118,7 @@ function openPlanoFormModal(planoId) {
   overlay.id = 'planoModalOverlay';
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
-    <div class="modal modal--large">
+    <div class="modal modal--large"  style="padding: 0px;">
       <div class="modal-header">
         <h2 class="modal-title">${isEdit ? 'Editar Plano de Aula' : 'Novo Plano de Aula'}</h2>
         <button class="modal-close" onclick="closePlanoModal()">×</button>

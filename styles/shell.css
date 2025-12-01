@@ -14,9 +14,11 @@
     display: grid;
     /* só aparece após login() */
     grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-areas: "sidebar main";
     min-height: 100dvh;
     width: 100%;
 }
+
 
 /* quando retraída */
 .app-shell.collapsed {
@@ -24,7 +26,9 @@
 }
 
 /* ---------------- Sidebar ---------------- */
+/* ---------------- Sidebar ---------------- */
 .sidebar {
+    grid-area: sidebar;
     width: 100%;
     background: #fff;
     border-right: 1px solid #E2E8F0;
@@ -37,6 +41,7 @@
     /* ocupa a altura inteira */
     overflow: hidden;
 }
+
 
 .sidebar-header {
     padding: 20px 12px;
@@ -167,6 +172,7 @@
 
 /* ---------------- Main ---------------- */
 .main-content {
+    grid-area: main;
     /* removemos margin-left */
     min-height: 100dvh;
     display: flex;
@@ -174,6 +180,7 @@
     overflow: hidden;
     /* topbar fixa + conteúdo rolável */
 }
+
 
 .topbar {
     background: #FFFFFF;

@@ -131,7 +131,7 @@ function openTurmaFormModal(turmaId) {
   overlay.className = 'modal-overlay';
 
   overlay.innerHTML = `
-    <div class="modal modal--large">
+    <div class="modal modal--large"   style="padding: 0px;">
       <div class="modal-header">
         <h2 class="modal-title">${isEdit ? 'Editar Turma' : 'Nova Turma'}</h2>
         <button class="modal-close" onclick="closeTurmaModal()">×</button>

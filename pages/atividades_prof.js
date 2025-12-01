@@ -146,7 +146,7 @@ function openAtividadeModal(id) {
   overlay.id = 'atividadeModalOverlay';
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
-    <div class="modal">
+    <div class="modal"  style="padding: 0px;">
       <div class="modal-header">
         <h2 class="modal-title">
           ${atividade ? 'Editar Atividade' : 'Nova Atividade'}

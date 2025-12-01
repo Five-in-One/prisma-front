@@ -1,12 +1,5 @@
+/* Até 1280px, só ajustes de largura dos elementos */
 @media (max-width: 1280px) {
-    .sidebar {
-        width: 240px;
-    }
-
-    .main-content {
-        margin-left: 240px;
-    }
-
     .search-input {
         width: 240px;
     }
@@ -16,35 +9,63 @@
     }
 }
 
+/* Até 955px: sidebar deixa de ser lateral e vira menu de topo retrátil */
+@media (max-width: 955px) {
 
-@media (max-width: 768px) {
+    /* layout em uma coluna: menu em cima, conteúdo embaixo */
+    .app-shell.active {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "sidebar"
+            "main";
+    }
+
+    /* sidebar vira uma barra no topo */
     .sidebar {
-        position: fixed;
-        left: 0;
+        position: sticky;
         top: 0;
-        height: 100dvh;
-        z-index: 50;
-        width: var(--sidebar-w);
-        transform: translateX(-100%);
-        transition: transform .3s ease;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #E2E8F0;
+        flex-direction: column;
+        z-index: 30;
     }
 
-    .sidebar.mobile-open {
-        transform: translateX(0);
+    .sidebar-header {
+        padding: 12px 16px;
     }
 
-    .main-content {
-        margin-left: 0;
+    /* nav inicialmente escondido (fica só o botão + logo) */
+    .sidebar-nav {
+        display: none;
+        padding: 8px 12px 12px;
     }
 
+    /* quando clicar no botão (toggleSidebar -> .mobile-open), mostra o menu */
+    .app-shell.mobile-open .sidebar-nav {
+        display: block;
+    }
+
+    /* itens ocupam largura toda ao abrir o menu */
+    .nav-item {
+        width: 100%;
+    }
+
+    /* topbar deixa de ser sticky para não brigar com o menu-topo */
     .topbar {
-        padding: 16px;
+        position: relative;
+        top: auto;
+        z-index: 10;
+        padding: 12px 16px;
     }
 
+    /* some a busca no topo pra sobrar espaço */
     .search-box {
         display: none;
     }
 
+    /* content mais apertadinho em telas menores */
     .content-area {
         padding: 16px;
     }
@@ -53,10 +74,7 @@
         grid-template-columns: 1fr;
     }
 
-    .app-shell.mobile-open .sidebar {
-        transform: translateX(0);
-    }
-
+    /* em uma coluna não faz sentido "collapsed" no grid */
     .app-shell.collapsed {
         grid-template-columns: 1fr;
     }
@@ -64,4 +82,18 @@
     .app-shell {
         grid-template-columns: 1fr;
     }
+}
+@media (max-width: 768px) {
+  .card-header {
+    grid-template-columns: 1fr;   /* tudo em uma coluna */
+    align-items: flex-start;
+  }
+
+  /* opcional: faz as ações ocuparem a largura toda e quebrarem bonitinho */
+  .card-header .card-actions {
+    justify-self: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
