@@ -24,6 +24,9 @@
     <link rel="stylesheet" href="styles/buttons.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="styles/shell.css">
+    <link rel="stylesheet" href="styles/atividade_aluno.css">
+    <link rel="stylesheet" href="styles/pop_model.css">
+    <link rel="stylesheet" href="styles/medalhas.css">
     <link rel="stylesheet" href="styles/cards-and-kpis.css">
     <link rel="stylesheet" href="styles/tables.css">
     <link rel="stylesheet" href="styles/filters-and-tabs.css">
@@ -33,12 +36,20 @@
   </head>
 
   <body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-container">
+      <div class="splash-content">
+        <img src="assets/svg/logo_escrito.svg" alt="Prisma"
+          class="splash-logo" />
+        <p class="splash-text">Carregando Prisma...</p>
+        <div class="splash-spinner"></div>
+      </div>
+    </div>
     <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
       <div class="login-card">
         <div class="login-logo">
-          <img src="assets/svg/logo_escrito.svg" alt="Logo"/>
-           
+          <img src="assets/svg/logo_escrito.svg" alt="Logo" />
 
           <p id="loginTitle">Bem-vindo ao Sistema de Gestão Acadêmica</p>
         </div>
@@ -143,7 +154,8 @@
             </svg>
           </button>
           <div class="sidebar-logo">
-            <img class="sidebar-logo-icon" src="assets/svg/icon_logo.svg" alt="Logo Quadrada"/>
+            <img class="sidebar-logo-icon" src="assets/svg/icon_logo.svg"
+              alt="Logo Quadrada" />
 
             <h2 id="sidebarSystemName">Prisma</h2>
           </div>

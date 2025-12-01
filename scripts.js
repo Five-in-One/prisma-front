@@ -14,10 +14,63 @@ const defaultConfig = {
 let currentUser = null;
 let currentView = 'dashboard';
 
+const LOGIN_STORAGE_KEY = 'prismaCurrentUser';
+const LOGIN_REMEMBER_KEY = 'prismaRememberMe';
+
+const VIEW_STORAGE_KEY = 'prismaCurrentView';
+const SPLASH_DELAY_MS = 1000;
+
+// Alunos fixos por turma (reutilizando os mesmos nomes das outras páginas)
+const ALUNOS_POR_TURMA = {
+  '9º A': [
+    { matricula: '2024001', nome: 'Ana Silva' },
+    { matricula: '2024002', nome: 'Bruno Santos' },
+    { matricula: '2024003', nome: 'Carlos Lima' }
+  ],
+  '9º B': [
+    { matricula: '2024101', nome: 'Eduarda Melo' },
+    { matricula: '2024102', nome: 'Felipe Souza' },
+    { matricula: '2024103', nome: 'Gabriel Lima' }
+  ],
+  '8º A': [
+    { matricula: '2024201', nome: 'Helena Rocha' },
+    { matricula: '2024202', nome: 'Igor Martins' },
+    { matricula: '2024203', nome: 'Juliana Alves' }
+  ]
+};
+
+// Qual storage usar para salvar a página atual
+function getPreferredStorage() {
+  return localStorage.getItem(LOGIN_REMEMBER_KEY) === '1'
+    ? localStorage
+    : sessionStorage;
+}
+
+// Salva a view atual
+function persistCurrentView(viewId) {
+  try {
+    const storage = getPreferredStorage();
+    storage.setItem(VIEW_STORAGE_KEY, viewId);
+  } catch (e) {
+    console.error('Erro ao salvar view:', e);
+  }
+}
+
+// Restaura view salva (tenta sessão, depois local)
+function restoreCurrentView() {
+  let view = null;
+  try {
+    view = sessionStorage.getItem(VIEW_STORAGE_KEY);
+    if (!view) view = localStorage.getItem(VIEW_STORAGE_KEY);
+  } catch (e) {
+    console.error('Erro ao restaurar view:', e);
+  }
+  return view || null;
+}
 // User profiles with navigation
 const userProfiles = {
   student: {
-    name: 'Aluno Silva',
+    name: 'João Silva',
     role: 'Aluno',
     avatar: 'AL',
     navigation: [
@@ -28,8 +81,20 @@ const userProfiles = {
       { id: 'historico', label: 'Histórico', icon: 'chart' }
     ]
   },
+  responsible: {
+    name: 'Marcos Silva',
+    role: 'Responsável',
+    avatar: 'RP',
+    navigation: [
+      { id: 'dashboard', label: 'Dashboard', icon: 'home' },
+      { id: 'boletim', label: 'Boletim', icon: 'document' },
+      { id: 'atividades', label: 'Atividades', icon: 'clipboard' },
+      { id: 'medalhas', label: 'Medalhas', icon: 'star' },
+      { id: 'historico', label: 'Histórico', icon: 'chart' }
+    ]
+  },
   teacher: {
-    name: 'Prof. Santos',
+    name: 'Prof. Laura',
     role: 'Professor',
     avatar: 'PS',
     navigation: [
@@ -41,7 +106,7 @@ const userProfiles = {
     ]
   },
   coordinator: {
-    name: 'Coord. Lima',
+    name: 'Coord. Diana',
     role: 'Coordenação',
     avatar: 'CL',
     navigation: [
@@ -69,11 +134,13 @@ const icons = {
 };
 
 // Login form handler
+// Login form handler
 document.getElementById('loginForm').addEventListener('submit', function (e) {
   e.preventDefault();
 
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
+  const rememberMe = document.getElementById('rememberMe').checked;
 
   // Reset errors
   document.getElementById('username').classList.remove('error');
@@ -100,11 +167,13 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
   // Validate credentials and determine user type
   let userType = null;
 
-  if ((username === 'aluno' || username === 'student') && password === '123456') {
+  if ((username === 'joao' || username === 'student') && password === '123456') {
     userType = 'student';
-  } else if ((username === 'professor' || username === 'prof') && password === '123456') {
+  } else if ((username === 'marcos' || username === 'responsible') && password === '123456') {
+    userType = 'responsible';
+  } else if ((username === 'laura' || username === 'prof') && password === '123456') {
     userType = 'teacher';
-  } else if ((username === 'coordenacao' || username === 'coord') && password === '123456') {
+  } else if ((username === 'diana' || username === 'coord') && password === '123456') {
     userType = 'coordinator';
   } else {
     // Invalid credentials
@@ -112,11 +181,31 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
     return;
   }
 
-  login(userType);
+  // passa o rememberMe para o login
+  login(userType, rememberMe);
 });
 
-function login(userType) {
+
+function login(userType, rememberMe = false, options = {}) {
+  // garante que o splash suma ao logar
+  const splash = document.getElementById('splashScreen');
+  if (splash) splash.style.display = 'none';
+
   currentUser = userProfiles[userType];
+
+  const payload = JSON.stringify({ userType });
+
+  // limpa antes de gravar
+  sessionStorage.removeItem(LOGIN_STORAGE_KEY);
+  localStorage.removeItem(LOGIN_STORAGE_KEY);
+  localStorage.removeItem(LOGIN_REMEMBER_KEY);
+
+  if (rememberMe) {
+    localStorage.setItem(LOGIN_STORAGE_KEY, payload);
+    localStorage.setItem(LOGIN_REMEMBER_KEY, '1');
+  } else {
+    sessionStorage.setItem(LOGIN_STORAGE_KEY, payload);
+  }
 
   // Hide login, show app
   document.getElementById('loginScreen').style.display = 'none';
@@ -128,23 +217,49 @@ function login(userType) {
   document.getElementById('userAvatar').textContent = currentUser.avatar;
   document.getElementById('breadcrumbRole').textContent = currentUser.role;
 
-  // Load navigation
+  // Monta o menu
   loadNavigation();
 
-  // Load dashboard
-  loadView('dashboard');
+  // Decide qual página abrir:
+  const storedView = restoreCurrentView();
+  const firstNavItemId = currentUser.navigation[0]?.id || 'dashboard';
 
-  showToast('Login realizado com sucesso!');
+  const initialView = (
+    storedView &&
+    currentUser.navigation.some(n => n.id === storedView)
+  )
+    ? storedView
+    : firstNavItemId;
+
+  currentView = initialView;
+  loadView(initialView);
+
+  if (!options.skipToast) {
+    showToast('Login realizado com sucesso!');
+  }
 }
+
+
 
 function logout() {
   currentUser = null;
+
+  // limpa login + view
+  sessionStorage.removeItem(LOGIN_STORAGE_KEY);
+  localStorage.removeItem(LOGIN_STORAGE_KEY);
+  localStorage.removeItem(LOGIN_REMEMBER_KEY);
+  sessionStorage.removeItem(VIEW_STORAGE_KEY);
+  localStorage.removeItem(VIEW_STORAGE_KEY);
+
   document.getElementById('appShell').classList.remove('active');
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
+  document.getElementById('rememberMe').checked = false;
+
   showToast('Logout realizado com sucesso!');
 }
+
 
 function loadNavigation() {
   const nav = document.getElementById('sidebarNav');
@@ -153,8 +268,8 @@ function loadNavigation() {
   currentUser.navigation.forEach(item => {
     const navItem = document.createElement('a');
     navItem.className = 'nav-item';
-    navItem.dataset.view = item.id;                 // <- id da view
-    navItem.href = '#';                              // acessível
+    navItem.dataset.view = item.id;
+    navItem.href = '#';
     navItem.innerHTML = `
       <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         ${icons[item.icon]}
@@ -168,18 +283,20 @@ function loadNavigation() {
     nav.appendChild(navItem);
   });
 
-  // marca o item inicial
-  setActive(currentView);
+  // quem marca o ativo agora é o loadView()
 }
 
 function loadView(viewId) {
   currentView = viewId;
 
+  // Salva view atual (cache)
+  persistCurrentView(viewId);
+
   // Update active nav item
   document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.remove('active');
+    const isActive = item.dataset.view === viewId;
+    item.classList.toggle('active', isActive);
   });
-  event?.currentTarget?.classList.add('active');
 
   // Update breadcrumb
   const viewLabel = currentUser.navigation.find(n => n.id === viewId)?.label || 'Dashboard';
@@ -190,6 +307,8 @@ function loadView(viewId) {
 
   if (viewId === 'dashboard') {
     if (currentUser.role === 'Aluno') {
+      contentArea.innerHTML = getStudentDashboard();
+    } else if (currentUser.role === 'Responsável') {
       contentArea.innerHTML = getStudentDashboard();
     } else if (currentUser.role === 'Professor') {
       contentArea.innerHTML = getTeacherDashboard();
@@ -226,6 +345,7 @@ function loadView(viewId) {
     contentArea.innerHTML = getUsuariosView();
   }
 }
+
 
 // Utility functions
 function toggleUserMenu() {
@@ -386,10 +506,10 @@ if (window.elementSdk) {
   });
 }
 
-function toggleSidebar(){
+function toggleSidebar() {
   const shell = document.getElementById('appShell');
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile){
+  if (isMobile) {
     shell.classList.toggle('mobile-open');      // abre/fecha off-canvas
   } else {
     shell.classList.toggle('collapsed');        // retrátil no desktop
@@ -397,20 +517,81 @@ function toggleSidebar(){
   }
 }
 
-// restaura estado do colapso no desktop
+// Splash + restaura estado do colapso + auto-login / lembrar-me com delay
 document.addEventListener('DOMContentLoaded', () => {
   const shell = document.getElementById('appShell');
-  if (localStorage.getItem('sidebarCollapsed') === '1'){
-    shell.classList.add('collapsed');
-  }
+  const splash = document.getElementById('splashScreen');
+  const loginScreen = document.getElementById('loginScreen');
+
+  // Estado inicial: só o splash aparece
+  if (splash) splash.style.display = 'flex';
+  if (loginScreen) loginScreen.style.display = 'none';
+  shell.classList.remove('active');
+
+  // só decide depois do "carregamento"
+  setTimeout(() => {
+    // Sidebar collapsed (desktop)
+    if (localStorage.getItem('sidebarCollapsed') === '1') {
+      shell.classList.add('collapsed');
+    }
+
+    // 1) tenta restaurar sessão atual (sessionStorage)
+    let stored = sessionStorage.getItem(LOGIN_STORAGE_KEY);
+
+    // 2) se não tiver, tenta "lembrar de mim" (localStorage)
+    if (!stored) {
+      stored = localStorage.getItem(LOGIN_STORAGE_KEY);
+    }
+
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        const userType = parsed.userType;
+
+        if (userProfiles[userType]) {
+          const rememberMe = !!localStorage.getItem(LOGIN_REMEMBER_KEY);
+          // auto-login silencioso (sem toast)
+          login(userType, rememberMe, { skipToast: true });
+
+          // já logou -> some com o splash
+          if (splash) splash.style.display = 'none';
+        } else {
+          // lixo no storage, limpa e manda pro login
+          sessionStorage.removeItem(LOGIN_STORAGE_KEY);
+          localStorage.removeItem(LOGIN_STORAGE_KEY);
+          localStorage.removeItem(LOGIN_REMEMBER_KEY);
+
+          if (splash) splash.style.display = 'none';
+          if (loginScreen) loginScreen.style.display = 'flex';
+        }
+      } catch (e) {
+        console.error('Erro ao restaurar sessão:', e);
+        sessionStorage.removeItem(LOGIN_STORAGE_KEY);
+        localStorage.removeItem(LOGIN_STORAGE_KEY);
+        localStorage.removeItem(LOGIN_REMEMBER_KEY);
+
+        if (splash) splash.style.display = 'none';
+        if (loginScreen) loginScreen.style.display = 'flex';
+        shell.classList.remove('active');
+      }
+    } else {
+      // nenhum login salvo -> mostra login normalmente
+      if (splash) splash.style.display = 'none';
+      if (loginScreen) loginScreen.style.display = 'flex';
+      shell.classList.remove('active');
+    }
+  }, SPLASH_DELAY_MS);
 });
+
+
+
 
 // fecha o off-canvas ao clicar fora (mobile)
 document.addEventListener('click', (e) => {
   const shell = document.getElementById('appShell');
   if (!shell.classList.contains('mobile-open')) return;
   const sidebar = document.querySelector('.sidebar');
-  if (!sidebar.contains(e.target) && !e.target.closest('.toggle-btn')){
+  if (!sidebar.contains(e.target) && !e.target.closest('.toggle-btn')) {
     shell.classList.remove('mobile-open');
   }
 });

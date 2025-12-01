@@ -1,0 +1,98 @@
+/* Texto de descrição nas conquistas */
+.activity-description {
+  font-size: 14px;
+  color: #475569;
+  margin-top: 8px;
+}
+
+/* Metas em progresso (medalhas) */
+.medal-metas-wrapper {
+  padding: 24px;
+}
+
+.meta-item {
+  margin-bottom: 24px;
+}
+
+.meta-item:last-child {
+  margin-bottom: 0;
+}
+
+.meta-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.meta-title {
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.meta-progress-text {
+  font-size: 14px;
+  color: #475569;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* Cores das barras, seguem seu esquema de cores */
+.progress-fill-primary {
+  background: #4F46E5;
+}
+
+.progress-fill-success {
+  background: #22C55E;
+}
+
+.progress-fill-warning {
+  background: #F59E0B;
+}
+
+/* Modal de medalhas (reaproveita .modal/.modal-backdrop existentes) */
+.medal-modal {
+  max-width: 480px;
+}
+
+.medal-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.medal-modal-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 16px;
+}
+
+.medal-modal-section {
+  margin-top: 12px;
+}
+
+.medal-modal-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 4px;
+}
+
+.medal-modal-section p {
+  font-size: 14px;
+  color: #475569;
+}
