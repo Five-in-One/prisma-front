@@ -1,4 +1,4 @@
-# Portal Acadêmico – Front-end
+# Prisma– Front-end
 
 Interface web em **HTML + CSS + JavaScript vanilla** para alunos, professores, coordenadores e equipe administrativa acompanharem e gerenciarem informações acadêmicas (notas, frequência, atividades, planos de aula, turmas e usuários).
 
